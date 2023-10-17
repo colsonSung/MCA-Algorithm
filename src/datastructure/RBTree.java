@@ -238,6 +238,116 @@ public class RBTree<K extends Comparable<K>, V> {
         return n != null? n.parent : null;
     }
 
+    /**
+     * 红黑树的删除
+     *    1. 首先是一般二叉树删除节点的操作，分以下三种情况
+     *      1. 被删除节点是叶子节点，直接删除即可
+     *      2. 被删除节点有一个子节点，用子节点替代被删除节点即可
+     *      3. 被删除节点有两个子节点，找到其前驱/后继节点进行替代（并非一定是左/右子节点）
+     *         注：前驱节点和后继节点，若存在子节点，只可能存在一个子节点；
+     *    2. 再通过旋转和变色实现平衡
+     * @param key
+     * @return
+     */
+    public V remove(K key){
+        RBNode node = findNode(key);
+
+        V oldValue = (V) node.getValue();
+        deleteNode(node);
+        return oldValue;
+
+    }
+
+    private RBNode findNode(K k){
+        RBNode n = this.root;
+        while(k != null && n != null){
+            int cmp = k.compareTo((K) n.getKey());
+            if(cmp < 0){
+                n = n.left;
+            } else if(cmp >=0 ){
+                n = n.right;
+            } else {
+                return n;
+            }
+        }
+        return null;
+    }
+
+    private void deleteNode(RBNode node) {
+        if(node.left != null && node.right != null){ //对应于情况3
+            //找到被删除节点的前驱节点，并用其进行替代
+            RBNode predecessor = findPredecessor(node);
+            node.key = predecessor.getKey();
+            node.value = predecessor.getValue();
+
+            //替代完成后，将node指向前驱节点，之后就是情况2/情况1
+            node = predecessor;
+        }
+
+        RBNode childNode = node.getLeft() != null ? node.getLeft() : node.getRight();
+        if(childNode != null){
+            //condition 2: 先删除node，使用其childNode替换后，根据childNode进行平衡调整
+            if(node.parent == null){
+                this.root = childNode;
+            } else if (parentOf(node).left == node) {
+                parentOf(node).left = childNode;
+            } else {
+                parentOf(node).right = childNode;
+            }
+            childNode.parent = parentOf(node);
+            node.parent = node.left = node.right = null;
+            
+            if(node.color == BLACK){
+                fixAfterDelete(childNode);
+            }
+        } else {
+            //condition 1: 直接根据node进行平衡调整，然后再删除
+            if(node.color == BLACK){
+                fixAfterDelete(node);
+            }
+
+            if(node.parent == null){
+                root = null;
+            } else if(node.parent.left == node){
+                node.parent.left = null;
+            } else {
+                node.parent.right = null;
+            }
+        }
+    }
+
+    /**
+     *
+     * @param node
+     */
+    private void fixAfterDelete(RBNode node) {
+
+    }
+
+    private RBNode findPredecessor(RBNode node) {
+        if(node == null){
+            return  null;
+        }
+
+        if (node.left != null){
+            RBNode p = node.left;
+            while(p.right != null){
+                p = p.right;
+            }
+            return p;
+        } else {
+            // 这种情况在删除中是不会出现的，但是对于查找前驱节点来说我们还是要来实现的一种情况
+            // 就是如果当前节点没有左子节点，那么我们就需要向上找
+            RBNode p = node.parent;
+            RBNode ch = node;
+            while(p != null && ch == p.left){
+                ch = p;
+                p = p.parent;
+            }
+            return p;
+        }
+    }
+
     static class RBNode<K extends Comparable<K>,V>{
         private RBNode parent;
         private RBNode left;
