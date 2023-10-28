@@ -1,4 +1,4 @@
-package concurrency;
+package concurrency.basic;
 
 import java.util.Random;
 import java.util.concurrent.Callable;

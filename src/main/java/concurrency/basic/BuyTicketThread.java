@@ -1,4 +1,4 @@
-package concurrency;
+package concurrency.basic;
 
 public class BuyTicketThread extends Thread{
     public BuyTicketThread(String name){

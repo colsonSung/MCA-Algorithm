@@ -1,6 +1,6 @@
-package concurrency;
+package concurrency.basic;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;

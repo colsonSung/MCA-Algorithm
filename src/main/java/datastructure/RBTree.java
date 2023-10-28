@@ -274,8 +274,8 @@ public class RBTree<K extends Comparable<K>, V> {
     }
 
     private void deleteNode(RBNode node) {
-        if(node.left != null && node.right != null){ //对应于情况3
-            //找到被删除节点的前驱节点，并用其进行替代
+        if(node.left != null && node.right != null){
+            //对应于情况3 找到被删除节点的前驱节点，并用其进行替代
             RBNode predecessor = findPredecessor(node);
             node.key = predecessor.getKey();
             node.value = predecessor.getValue();
@@ -321,7 +321,12 @@ public class RBTree<K extends Comparable<K>, V> {
      * @param node
      */
     private void fixAfterDelete(RBNode node) {
+        //黑色节点的情况下才需要进行平衡调整
+        if(node != root && node.color == BLACK){
 
+        }
+
+        //
     }
 
     private RBNode findPredecessor(RBNode node) {
